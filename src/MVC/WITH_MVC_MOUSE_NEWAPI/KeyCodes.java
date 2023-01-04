@@ -1,5 +1,7 @@
 package MVC.WITH_MVC_MOUSE_NEWAPI;
+
 public abstract class KeyCodes {
+
    public static final int RIGHT = -2;
    public static final int LEFT = -3;
    public static final int HOME = -4;

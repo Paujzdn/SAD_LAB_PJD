@@ -3,7 +3,9 @@ package MVC.WITH_MVC;
 public class Console {
 
     private Line line;
+
     public Console(Line line){
+
         this.line = line;
     }
 

@@ -1,53 +1,48 @@
 package Xat_Grafic;
 import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.Socket;
 
-public class MySocket {
-    public Socket socket;
-    public BufferedReader in;
-    public PrintWriter out;
-    public String username;
+public class MySocket extends Socket {
+    private Socket socket;
+    private BufferedReader input;
+    private PrintWriter output;
 
-
-    public MySocket(Socket socket) {
-        this.socket = socket;
-        try {
-            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.out = new PrintWriter(this.socket.getOutputStream(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public MySocket(String host, int port) {
+    public MySocket(String userName, String host, int port) {
         try {
             this.socket = new Socket(host, port);
-            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.out = new PrintWriter(this.socket.getOutputStream(), true);
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            output = new PrintWriter(socket.getOutputStream(), true);
+            printLine(userName);
+
         } catch (IOException e) {
+            System.err.println("No se ha podido crear Socket");
             e.printStackTrace();
         }
     }
 
-    public String readLine() {
-        try {
-            return in.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+    public String readLine() throws IOException {
+        String string = null;
+
+        string = input.readLine();
+
+        return string;
     }
 
-    public void printLine(String msg) {out.println(msg);}
+    public void printLine(String string) {
+        output.println(string);
+        output.flush();
+    }
+
+    @Override
     public void close() {
         try {
-            this.in.close();
-            this.out.close();
-            this.socket.close();
+            printLine("EXIT");
+            input.close();
+            output.close();
+            socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("No se ha podido cerrar el Socket");
         }
     }
-
-
 }

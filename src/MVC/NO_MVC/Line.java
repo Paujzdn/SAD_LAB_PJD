@@ -1,64 +1,75 @@
 package MVC.NO_MVC;
 
+import java.util.ArrayList;
+
 public class Line {
 
     int x;
     boolean ins;
-    String text;
+    private ArrayList<Character> text;
 
     public Line() {
 
-        this.text = "";
+        this.text = new ArrayList<>();
         this.x = 0;
         this.ins = true;
     }
 
+    public boolean setLine(char c) {
+
+        if (ins) {
+            text.add(x, c);
+            x++;
+            return true;
+        } else {
+
+            if (x >= text.size() - 1) {
+                text.add(x, c);
+            } else {
+                text.set(x, c);
+            }
+            x++;
+            return false;
+        }
+    }
+
+    public int home() {
+
+        int cA = x;
+        this.x = 0;
+        return cA;
+    }
+
     public int getpos(){return x;}
 
-    public void home(){x=0;}
+    public String getLine(){
 
-    public String getLine(){return text;}
+        String line = "";
 
-    public void end(){x=text.length();}
+        for(Character c : text) {
+
+            line += c;
+        }
+
+        return line;
+    }
+
+    public int end(){
+
+        int cA = x;
+        x=text.size();
+        return cA;
+    }
 
     public void insert(){this.ins = !ins;}
 
-    public String insertChar(char cr,boolean i) {
-
-        if (i) {
-
-            String que = text.substring(x);
-            text = text.substring(0,x)+cr+que;
-            x++;
-
-        } else {
-
-            if (x == text.length()) {
-
-                text=text+cr;
-                x++;
-            }
-
-            else {
-
-                String que = text.substring(x+1);
-                text=text.substring(0,x)+cr+que;
-                x++;
-            }
-        }
-
-        return text.substring(x-1);
-    }
-
     public boolean right() {
 
-        if (x < text.length()) {
+        if (x < text.size()) {
 
             x++;
             return true;
-
         }
-
         else return false;
     }
 
@@ -69,39 +80,27 @@ public class Line {
             x--;
             return true;
         }
-
-        else {
-
-            return false;
-        }
+        else return false;
     }
 
-    public void supr() {
+    public boolean supr() {
 
-        if (x < text.length()) {
+        if (x < text.size()) {
 
-            String que = text.substring(x+1);
-            text=text.substring(0,x)+que;
+            text.remove(x);
+            return true;
         }
-
-        else {
-
-            System.out.println("\007");
-        }
+        else return false;
     }
 
-    public void bksp() {
+    public boolean bksp() {
 
         if (x > 0) {
 
-            String que = text.substring(x);
-            text=text.substring(0,x-1)+que;
+            text.remove(x - 1);
             x--;
+            return true;
         }
-
-        else {
-
-            System.out.println("\007");
-        }
+        else return false;
     }
 }

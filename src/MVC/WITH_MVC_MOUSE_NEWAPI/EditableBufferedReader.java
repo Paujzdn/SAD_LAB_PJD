@@ -94,7 +94,7 @@ public class EditableBufferedReader extends BufferedReader {
     public String readLine() throws IOException {
 
         setRaw();
-        Console console = new Console();
+        console = new Console();
         Line line = new Line(console);
         line.setRow(getRow());
         int entry = 0;

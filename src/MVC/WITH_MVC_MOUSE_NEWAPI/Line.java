@@ -1,8 +1,6 @@
 package MVC.WITH_MVC_MOUSE_NEWAPI;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import java.beans.*;
 
 public class Line{
 

@@ -33,102 +33,106 @@ public class EditableBufferedReader extends BufferedReader{
         } catch(IOException e) { System.out.println("Error unsetRaw()");}
     }
 
-
-    private boolean find(String editkey) throws IOException{
-
-        mark(editkey.length());
-        int keycd;
-
-        for(int i = 0; i<editkey.length(); i++){
-
-            keycd = super.read();
-
-            if (keycd == -1 || keycd != editkey.charAt(i)){
-
-                reset(); 
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-
+    @Override
     public int read() throws IOException {
+        int read;
 
-        if (find("\033\133\110")) return KeyCodes.HOME;
+        switch (read = super.read()) {
+            case '\033':
+                super.read(); //Discarding the \133, as all codes have it
 
-        if (find("\033\133\062\176")) return KeyCodes.INS;
+                switch (super.read()) {
+                    case '\103':
+                        return KeyCodes.RIGHT;
+                    case '\104':
+                        return KeyCodes.LEFT;
+                    case '\110':
+                        return KeyCodes.HOME;
+                    case '\106':
+                        return KeyCodes.END;
+                    case '\062':
+                        super.read();
+                        return KeyCodes.INS;
+                    case '\063':
+                        super.read();
+                        return KeyCodes.SUPR;
+                }
 
-        if (find("\033\133\063\176")) return KeyCodes.SUPR;
+            default:
+                return read;
 
-        if (find("\033\133\106")) return KeyCodes.END;
-
-        if (find("\033\133\103")) return KeyCodes.RIGHT;
-
-        if (find("\033\133\104")) return KeyCodes.LEFT;
-
-        if (find("\177")) return KeyCodes.BKS;
-
-        return super.read();
+        }
     }
 
+    @Override
 
     public String readLine() throws IOException {
 
-        int entry=0;
+        int readline;
         this.setRaw();
 
-        while (entry != '\015') {
-            //Here we print on regx, telling the console what to do in case we have read an edit key.
-            // Otherwise it just inserts the usual char on the text atribute of Line class
-            switch (entry=read()) {
+        while ((readline = this.read()) != KeyCodes.ENTER) {
+
+            switch (readline) {
 
                 case KeyCodes.RIGHT:
-                    //Cursor to the right
-                    if (line.right()) System.out.print("\033\133\103");
+
+                    if (line.right()) {
+
+                        System.out.print("\033\133\103");
+                    }
                     break;
 
                 case KeyCodes.LEFT:
-                    //Cursor to the left
-                    if (line.left()) System.out.print("\033\133\104");
+
+                    if (line.left()) {
+
+                        System.out.print("\033\133\104");
+                    }
                     break;
 
                 case KeyCodes.HOME:
-                    //Cursor to the start of the line
-                    System.out.print("\033\133\061\107");
+
+                    System.out.print("\033[" + line.home() + "D");
                     break;
 
                 case KeyCodes.END:
-                    //Cursor to the end of line
-                    line.end();
-                    System.out.print("\033[" + (line.getpos()+1) + "\107");
+
+                    if(line.end() > 0){
+
+                        System.out.print("\033[" + line.end() + "C");
+                    }
                     break;
 
                 case KeyCodes.INS:
-                    //Change ins mode, through a line method
+
                     line.insert();
                     break;
 
                 case KeyCodes.SUPR:
-                    //Del char to the right
-                    line.supr();
-                    System.out.print("\033\133\061\120");
+
+                    if (line.supr()) {
+
+                        System.out.print("\033\133\061\120");
+                    }
                     break;
 
-                case KeyCodes.BKS:
-                    //Del char to the left
-                    line.bksp();
-                    System.out.print("\033[1D" + "\033\133\061\120");
+                case KeyCodes.BKSP:
+
+                    if (line.bksp()) {
+
+                        System.out.print("\033[1D" + "\033\133\061\120");
+                    }
                     break;
 
                 default:
-                    //Insering default char to the string on line
-                    System.out.print("\033\133\060\113" + line.insertChar((char) entry, line.ins) + "\033[" + (line.getpos() +1) + "\107");
+                    System.out.print((char) readline);
+
             }
         }
 
         this.unsetRaw();
         return line.getLine();
+
     }
 }
